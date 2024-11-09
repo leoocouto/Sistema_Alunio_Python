@@ -1,0 +1,67 @@
+import os
+
+# Lista para armazenar os dados dos alunos
+alunos = []
+
+def adicionar_aluno():
+    nome = input("Nome do aluno: ")
+    notas = []
+
+    while len(notas) < 2 or len(notas) > 5:
+        notas_input = input("Insira as notas (separadas por vírgula): ")
+        try:
+            notas = [float(nota.strip()) for nota in notas_input.split(",")]
+            if not all(0 <= nota <= 10 for nota in notas):
+                raise ValueError("As notas devem estar entre 0 e 10.")
+            if len(notas) < 2 or len(notas) > 5:
+                print("Você deve inserir entre 2 e 5 notas.")
+        except ValueError as e:
+            print(f"Entrada inválida: {e}. Tente novamente.")
+
+    media = sum(notas) / len(notas)
+    aluno = {
+        'nome': nome,
+        'notas': notas,
+        'media': media
+    }
+    
+    alunos.append(aluno)
+
+def ordenar_alunos():
+    alunos.sort(key=lambda x: x['media'], reverse=True)
+
+def salvar_em_arquivo():
+    filename = 'alunos.txt'
+    
+    if os.path.exists(filename):
+        escolha = input(f"O arquivo '{filename}' já existe. Deseja sobrescrever? (s/n): ").strip().lower()
+        if escolha != 's':
+            print("Operação cancelada. Os dados não foram salvos.")
+            return
+
+    try:
+        with open(filename, 'w') as file:
+            for aluno in alunos:
+                file.write(f"{aluno['nome']}, {aluno['media']:.2f}\n")
+        print(f"Os dados foram salvos no arquivo '{filename}'.")
+    except Exception as e:
+        print(f"Ocorreu um erro ao salvar os dados no arquivo: {e}")
+
+def exibir_alunos():
+    print("Alunos ordenados por média:")
+    for aluno in alunos:
+        print(f"{aluno['nome']} - Média: {aluno['media']:.2f}")
+
+def main():
+    while True:
+        adicionar_aluno()
+        continuar = input("Deseja adicionar outro aluno? (s/n): ").strip().lower()
+        if continuar != 's':
+            break
+
+    ordenar_alunos()
+    exibir_alunos()
+    salvar_em_arquivo()
+
+if __name__ == "__main__":
+    main()
